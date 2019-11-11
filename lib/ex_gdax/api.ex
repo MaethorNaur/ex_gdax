@@ -3,6 +3,7 @@ defmodule ExGdax.Api do
   Provides basic HTTP interface with GDAX API.
   """
   alias ExGdax.Config
+  alias ExGdax.Response
 
   def get(path, params \\ %{}, config \\ nil) do
     config = Config.config_or_env_config(config)
@@ -67,12 +68,25 @@ defmodule ExGdax.Api do
     |> Base.encode64()
   end
 
-  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) when code in 200..299, do: Jason.decode(body)
-  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) do
-    {:error, {case Jason.decode(body) do
-      {:ok, json} -> json["message"]
-      {:error, _} -> body
-    end, code}}
+  defp parse_response({:ok, %HTTPoison.Response{headers: headers, body: body, status_code: code}})
+       when code in 200..299 do
+    with {:ok, json} <- Jason.decode(body) do
+      {:ok,
+       Enum.reduce(headers, %Response{data: json}, fn
+         {"cb-after", cb_after}, acc -> %Response{acc | after: cb_after}
+         {"cb-before", cb_before}, acc -> %Response{acc | before: cb_before}
+         _, acc -> acc
+       end)}
+    end
   end
+
+  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) do
+    {:error,
+     {case Jason.decode(body) do
+        {:ok, json} -> json["message"]
+        {:error, _} -> body
+      end, code}}
+  end
+
   defp parse_response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
 end

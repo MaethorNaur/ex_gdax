@@ -1,5 +1,6 @@
 defmodule ExGdaxTest do
   use ExUnit.Case
+  alias ExGdax.Response
 
   import TestHelper
 
@@ -8,7 +9,7 @@ defmodule ExGdaxTest do
       response = http_response([%{"id" => "ETH"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"id" => "ETH"}]} == ExGdax.list_currencies()
+        assert {:ok, %Response{data: [%{"id" => "ETH"}]}} == ExGdax.list_currencies()
       end)
     end
   end
@@ -18,7 +19,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"iso" => "2017-07-24T06:04:06.126Z"}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"iso" => "2017-07-24T06:04:06.126Z"}} == ExGdax.get_time()
+        assert {:ok, %Response{data: %{"iso" => "2017-07-24T06:04:06.126Z"}}} == ExGdax.get_time()
       end)
     end
   end
@@ -28,7 +29,7 @@ defmodule ExGdaxTest do
       response = http_response([%{"id" => "ETH-USD"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"id" => "ETH-USD"}]} == ExGdax.list_products()
+        assert {:ok, %Response{data: [%{"id" => "ETH-USD"}]}} == ExGdax.list_products()
       end)
     end
   end
@@ -38,7 +39,8 @@ defmodule ExGdaxTest do
       response = http_response(%{"asks" => [], "bids" => []}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"asks" => [], "bids" => []}} == ExGdax.get_order_book("ETH-USD")
+        assert {:ok, %Response{data: %{"asks" => [], "bids" => []}}} ==
+                 ExGdax.get_order_book("ETH-USD")
       end)
     end
 
@@ -46,7 +48,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"asks" => [[], []], "bids" => [[], []]}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"asks" => [[], []], "bids" => [[], []]}} ==
+        assert {:ok, %Response{data: %{"asks" => [[], []], "bids" => [[], []]}}} ==
                  ExGdax.get_order_book("ETH-USD", %{level: 2})
       end)
     end
@@ -65,7 +67,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"price" => "200.00"}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"price" => "200.00"}} == ExGdax.get_ticker("ETH-USD")
+        assert {:ok, %Response{data: %{"price" => "200.00"}}} == ExGdax.get_ticker("ETH-USD")
       end)
     end
 
@@ -83,7 +85,7 @@ defmodule ExGdaxTest do
       response = http_response([%{"price" => "200.00"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"price" => "200.00"}]} == ExGdax.list_trades("ETH-USD")
+        assert {:ok, %Response{data: [%{"price" => "200.00"}]}} == ExGdax.list_trades("ETH-USD")
       end)
     end
 
@@ -101,7 +103,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} == ExGdax.list_historic_rates("ETH-USD")
+        assert {:ok, %Response{data: []}} == ExGdax.list_historic_rates("ETH-USD")
       end)
     end
 
@@ -119,7 +121,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"high" => "420.00"}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"high" => "420.00"}} == ExGdax.get_stats("ETH-USD")
+        assert {:ok, %Response{data: %{"high" => "420.00"}}} == ExGdax.get_stats("ETH-USD")
       end)
     end
 
@@ -137,7 +139,7 @@ defmodule ExGdaxTest do
       response = http_response([%{"balance" => "0.00"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"balance" => "0.00"}]} = ExGdax.list_accounts()
+        assert {:ok, %Response{data: [%{"balance" => "0.00"}]}} = ExGdax.list_accounts()
       end)
     end
 
@@ -151,7 +153,7 @@ defmodule ExGdaxTest do
       response = http_response([%{"balance" => "0.00"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"balance" => "0.00"}]} = ExGdax.list_accounts(config)
+        assert {:ok, %Response{data: [%{"balance" => "0.00"}]}} = ExGdax.list_accounts(config)
       end)
     end
   end
@@ -161,7 +163,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"balance" => "0.00"}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{"balance" => "0.00"}} = ExGdax.get_account("xxx")
+        assert {:ok, %Response{data: %{"balance" => "0.00"}}} = ExGdax.get_account("xxx")
       end)
     end
   end
@@ -171,7 +173,8 @@ defmodule ExGdaxTest do
       response = http_response([%{"amount" => "0.00"}], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, [%{"amount" => "0.00"}]} = ExGdax.list_account_history("xxx")
+        assert {:ok, %Response{data: [%{"amount" => "0.00"}]}} =
+                 ExGdax.list_account_history("xxx")
       end)
     end
   end
@@ -181,7 +184,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_holds("xxx")
+        assert {:ok, %Response{data: []}} = ExGdax.list_holds("xxx")
       end)
     end
   end
@@ -191,7 +194,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"price" => "1.00"}, 201)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{"price" => "1.00"}} =
+        assert {:ok, %Response{data: %{"price" => "1.00"}}} =
                  ExGdax.create_order(%{side: "buy", product_id: "ETH-USD", price: "1.00"})
       end)
     end
@@ -202,7 +205,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:delete, response, fn ->
-        assert {:ok, []} = ExGdax.cancel_orders()
+        assert {:ok, %Response{data: []}} = ExGdax.cancel_orders()
       end)
     end
   end
@@ -212,7 +215,7 @@ defmodule ExGdaxTest do
       response = http_response("b203599c-24d4-4053-863b-29fd711ab3ed", 200)
 
       with_mock_request(:delete, response, fn ->
-        assert {:ok, "b203599c-24d4-4053-863b-29fd711ab3ed"} =
+        assert {:ok, %Response{data: "b203599c-24d4-4053-863b-29fd711ab3ed"}} =
                  ExGdax.cancel_order("b203599c-24d4-4053-863b-29fd711ab3ed")
       end)
     end
@@ -223,7 +226,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_orders()
+        assert {:ok, %Response{data: []}} = ExGdax.list_orders()
       end)
     end
   end
@@ -233,7 +236,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{}} = ExGdax.get_order("xxx")
+        assert {:ok, %Response{data: %{}}} = ExGdax.get_order("xxx")
       end)
     end
   end
@@ -243,7 +246,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_fills()
+        assert {:ok, %Response{data: []}} = ExGdax.list_fills()
       end)
     end
   end
@@ -253,7 +256,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_funding()
+        assert {:ok, %Response{data: []}} = ExGdax.list_funding()
       end)
     end
   end
@@ -263,7 +266,8 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} = ExGdax.repay_funding(%{amount: "1.00", currency: "USD"})
+        assert {:ok, %Response{data: %{}}} =
+                 ExGdax.repay_funding(%{amount: "1.00", currency: "USD"})
       end)
     end
   end
@@ -273,7 +277,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} =
+        assert {:ok, %Response{data: %{}}} =
                  ExGdax.margin_transfer(%{
                    margin_profile_id: "xxx",
                    type: "deposit",
@@ -289,7 +293,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{}} = ExGdax.get_position()
+        assert {:ok, %Response{data: %{}}} = ExGdax.get_position()
       end)
     end
   end
@@ -299,7 +303,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} = ExGdax.close_position(%{repay_only: true})
+        assert {:ok, %Response{data: %{}}} = ExGdax.close_position(%{repay_only: true})
       end)
     end
   end
@@ -309,7 +313,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} =
+        assert {:ok, %Response{data: %{}}} =
                  ExGdax.deposit_from_coinbase(%{
                    amount: "1.00",
                    currency: "ETH",
@@ -324,7 +328,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} =
+        assert {:ok, %Response{data: %{}}} =
                  ExGdax.withdraw_to_payment_method(%{
                    amount: "1.00",
                    currency: "USD",
@@ -339,7 +343,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} =
+        assert {:ok, %Response{data: %{}}} =
                  ExGdax.withdraw_to_coinbase(%{
                    amount: "1.00",
                    currency: "BTC",
@@ -354,7 +358,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} =
+        assert {:ok, %Response{data: %{}}} =
                  ExGdax.withdraw_to_crypto(%{
                    amount: "1.00",
                    currency: "ETH",
@@ -369,7 +373,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_payment_methods()
+        assert {:ok, %Response{data: []}} = ExGdax.list_payment_methods()
       end)
     end
   end
@@ -379,7 +383,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_coinbase_accounts()
+        assert {:ok, %Response{data: []}} = ExGdax.list_coinbase_accounts()
       end)
     end
   end
@@ -389,7 +393,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 201)
 
       with_mock_request(:post, response, fn ->
-        assert {:ok, %{}} = ExGdax.create_report(%{})
+        assert {:ok, %Response{data: %{}}} = ExGdax.create_report(%{})
       end)
     end
   end
@@ -399,7 +403,7 @@ defmodule ExGdaxTest do
       response = http_response(%{}, 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, %{}} = ExGdax.get_report("xxx")
+        assert {:ok, %Response{data: %{}}} = ExGdax.get_report("xxx")
       end)
     end
   end
@@ -409,7 +413,7 @@ defmodule ExGdaxTest do
       response = http_response([], 200)
 
       with_mock_request(:get, response, fn ->
-        assert {:ok, []} = ExGdax.list_trailing_volume()
+        assert {:ok, %Response{data: []}} = ExGdax.list_trailing_volume()
       end)
     end
   end
@@ -425,7 +429,9 @@ defmodule ExGdaxTest do
       with_mock_request(:get, response, fn ->
         assert ExGdax.user_fee_rate() == {
                  :ok,
-                 %{"fee" => "0.0030", "usd_volume" => nil, "fee_usd_total" => nil}
+                 %Response{
+                   data: %{"fee" => "0.0030", "usd_volume" => nil, "fee_usd_total" => nil}
+                 }
                }
       end)
     end
