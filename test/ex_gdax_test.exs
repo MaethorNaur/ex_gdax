@@ -55,7 +55,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"message" => "Resource not found"}, 404)
 
       with_mock_request(:get, response, fn ->
-        assert {:error, "Resource not found", 404} == ExGdax.get_order_book("ETC-USD")
+        assert {:error, {"Resource not found", 404}} == ExGdax.get_order_book("ETC-USD")
       end)
     end
   end
@@ -73,7 +73,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"message" => "Resource not found"}, 404)
 
       with_mock_request(:get, response, fn ->
-        assert {:error, "Resource not found", 404} == ExGdax.get_ticker("ETC-USD")
+        assert {:error, {"Resource not found", 404}} == ExGdax.get_ticker("ETC-USD")
       end)
     end
   end
@@ -91,7 +91,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"message" => "Resource not found"}, 404)
 
       with_mock_request(:get, response, fn ->
-        assert {:error, "Resource not found", 404} == ExGdax.list_trades("ETC-USD")
+        assert {:error, {"Resource not found", 404}} == ExGdax.list_trades("ETC-USD")
       end)
     end
   end
@@ -109,7 +109,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"message" => "Resource not found"}, 404)
 
       with_mock_request(:get, response, fn ->
-        assert {:error, "Resource not found", 404} == ExGdax.list_historic_rates("ETC-USD")
+        assert {:error, {"Resource not found", 404}} == ExGdax.list_historic_rates("ETC-USD")
       end)
     end
   end
@@ -127,7 +127,7 @@ defmodule ExGdaxTest do
       response = http_response(%{"message" => "Resource not found"}, 404)
 
       with_mock_request(:get, response, fn ->
-        assert {:error, "Resource not found", 404} == ExGdax.get_stats("ETC-USD")
+        assert {:error, {"Resource not found", 404}} == ExGdax.get_stats("ETC-USD")
       end)
     end
   end

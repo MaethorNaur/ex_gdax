@@ -24,7 +24,7 @@ defmodule ExGdax.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
-      {:poison, "~> 4.0"},
+      {:jason, "~> 1.1"},
       {:mock, "~> 0.2.1", only: :test},
       {:credo, "~> 0.8.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},

@@ -19,7 +19,7 @@ defmodule ExGdax.Api do
 
     path
     |> url(config)
-    |> HTTPoison.post(Poison.encode!(params), headers("POST", path, params, config))
+    |> HTTPoison.post(Jason.encode!(params), headers("POST", path, params, config))
     |> parse_response()
   end
 
@@ -59,7 +59,7 @@ defmodule ExGdax.Api do
 
   defp sign_request(timestamp, method, path, body, config) do
     key = Base.decode64!(config.api_secret || "")
-    body = if Enum.empty?(body), do: "", else: Poison.encode!(body)
+    body = if Enum.empty?(body), do: "", else: Jason.encode!(body)
     data = "#{timestamp}#{method}#{path}#{body}"
 
     :sha256
@@ -67,20 +67,12 @@ defmodule ExGdax.Api do
     |> Base.encode64()
   end
 
-  defp parse_response(response) do
-    case response do
-      {:ok, %HTTPoison.Response{body: body, status_code: code}} ->
-        if code in 200..299 do
-          {:ok, Poison.decode!(body)}
-        else
-          case Poison.decode(body) do
-            {:ok, json} -> {:error, json["message"], code}
-            {:error, _} -> {:error, body, code}
-          end
-        end
-
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, reason}
-    end
+  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) when code in 200..299, do: Jason.decode(body)
+  defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: code}}) do
+    {:error, {case Jason.decode(body) do
+      {:ok, json} -> json["message"]
+      {:error, _} -> body
+    end, code}}
   end
+  defp parse_response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
 end
